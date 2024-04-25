@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>내비게임 최고 평점 영화 콜렉션</title>
+	<style>
+        header {
+            background-color: #ffe194;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 0;
+        }
+		body {
+			font-family: Arial, sans-serif;
+			text-align: center;
+            background: url("https://nabacam-movies.vercel.app/assets/bg.png") center/cover no-repeat;
+            min-height: 100vh;
+		}
+		h1 {
+			color: #333;
+		}
+		.search-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0;
+            border-bottom: 1px solid black;
+		}
+		.search-container input[type=text] {
+            margin-left: 20px;
+            margin-right: 10px;
+            min-width: 200px;
+            padding: 5px 10px;
+		}
+		.search-container button {
+			padding: 10px 15px;
+			background: #333;
+			color: white;
+			border: none;
+			cursor: pointer;
+		}
+		.movie-container {
+			margin-left: 5%;
+			display: grid; 
+    		grid-template-columns: repeat(3, 1fr);
+    		gap: 20px;
+    		margin-top: 30px;
+		}
+		.movie-card {
+			background-color: bisque;
+            border-radius: 5px;
+			border: 1px solid #ddd;
+			padding: 20px;
+			margin: 10px;
+			text-align: left;
+			display: inline-block;
+			margin-right: auto;
+			width:60%;
+		}
+
+		.movie-card img {
+			max-width: 100%;
+			height: auto;
+		}
+		.movie-card h2 {
+			color: #333;
+			margin-top: 10px;
+		}
+		.movie-card p {
+			color: #666;
+			margin-top: 5px;
+		}
+	</style>
+	<script>
+		const apiKey = '0b8124cf1da3bd05343bf187ce0f6e56';
+		const options = {
+		  method: 'GET',
+		  headers: {
+		    accept: 'application/json',
+		    Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIwYjgxMjRjZjFkYTNiZDA1MzQzYmYxODdjZTBmNmU1NiIsInN1YiI6IjY2MmEwOTkyOGZkZGE5MDExZGRjZDE4NyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.1Xr7w3KswALa0bkj6wTidMkgRvgrp2RhvCgtb7SR2fo'
+		  }
+		};
+
+
+		window.onload = function(){
+			const url = new URL(window.location.href);
+            const queryParams = new URLSearchParams(url.search);
+				if(queryParams.get('search')){
+					getMovieData(queryParams.get('search'));
+				}else{
+				fetch('https://api.themoviedb.org/3/movie/top_rated?language=en-US&page=1', options)
+			.then(response => response.json())
+			.then(response => {
+				const array = response.results;
+				//array[0].id, array[0].original_title, array[0].overview, array[0].vote_average
+				/*let imsiHtml = `<div class="movie-card">
+				<img src="https://image.tmdb.org/t/p/original${array[0].poster_path}" alt="The Shawshank Redemption">
+				<h2>${array[0].original_title}</h2>
+				<p>${array[0].overview}</p>
+				<p>Rating : ${array[0].vote_average}</p>
+				</div>`;*/
+				let imsiHtml =``;
+
+				for(let i = 0; i<array.length; i ++){
+					if(i==0){
+						imsiHtml = `<div class="movie-card"  onclick="alertId(${array[i].id})" style="cursor: pointer;">
+						<img src="https://image.tmdb.org/t/p/original${array[i].poster_path}" alt="The Shawshank Redemption">
+						<h2>${array[i].original_title}</h2>
+						<p>${array[i].overview}</p>
+						<p>Rating : ${array[i].vote_average}</p>
+						</div>`;
+					}else{
+						imsiHtml += `<div class="movie-card" onclick="alertId(${array[i].id})" style="cursor: pointer;">
+						<img src="https://image.tmdb.org/t/p/original${array[i].poster_path}" alt="The Shawshank Redemption">
+						<h2>${array[i].original_title}</h2>
+						<p>${array[i].overview}</p>
+						<p>Rating : ${array[i].vote_average}</p>
+						</div>`;
+					}
+				}
+
+				document.getElementById("movies").innerHTML=imsiHtml;
+				console.log(array)}
+			)
+			.catch(err => console.error(err));
+			}
+		}
+		function alertId(a){
+			alert(a);
+		}
+
+		function getMovieData(str){
+			let name = str.replace(/ /g, "+");
+			fetch('https://api.themoviedb.org/3/search/movie?query='+name+'&api_key='+apiKey+'&language=en-US&page=1')
+		  .then(response => response.json())
+		  .then(response => {
+			const array = response.results;
+			let imsiHtml =``;
+			for(let i = 0; i<array.length; i ++){
+				if(i==0){
+					imsiHtml = `<div class="movie-card"  onclick="alertId(${array[i].id})" style="cursor: pointer;">
+					<img src="https://image.tmdb.org/t/p/original${array[i].poster_path}" alt="The Shawshank Redemption">
+					<h2>${array[i].original_title}</h2>
+					<p>${array[i].overview}</p>
+					<p>Rating : ${array[i].vote_average}</p>
+					</div>`;
+				}else{
+					imsiHtml += `<div class="movie-card" onclick="alertId(${array[i].id})" style="cursor: pointer;">
+					<img src="https://image.tmdb.org/t/p/original${array[i].poster_path}" alt="The Shawshank Redemption">
+					<h2>${array[i].original_title}</h2>
+					<p>${array[i].overview}</p>
+					<p>Rating : ${array[i].vote_average}</p>
+					</div>`;
+				}
+			}
+
+			document.getElementById("movies").innerHTML=imsiHtml;
+			console.log(array)}
+		)
+		  .catch(err => console.error(err));
+		}
+
+
+	</script>
+</head>
+<body>
+    <header>
+	<h1>내비게임 최고 평점 영화 콜렉션</h1>
+    </header>
+	<div class="search-container">
+		<form onsubmit="getMovieData(this)">
+        	<label style="font-size: 25px;">영화 검색 : </label>
+			<input type="text" placeholder="영화 제목 검색" name="search">
+			<button type="submit">검색</button>
+		</form>
+	</div>
+	<div id="movies" class="movie-container">
+		<div class="movie-card">
+			<img src="#" alt="The Shawshank Redemption">
+			<h2>The Shawshank Redemption</h2>
+			<p>Framed in the 1940s for the double</p>
+		</div>
+		<div class="movie-card">
+			<img src="#" alt="The Godfather">
+			<h2>The Godfather</h2>
+			<p>Spanning the years 1945 to 1955, a...</p>
+		</div>
+		<div class="movie-card">
+			<img src="#" alt="The Godfather Part II">
+			<h2>The Godfather Part II</h2>
+			<p>In the continuing saga of the Corleone...</p>
+		</div>
+        <div class="movie-card">
+			<img src="#" alt="The Godfather Part II">
+			<h2>The Godfather Part II</h2>
+			<p>In the continuing saga of the Corleone...</p>
+		</div>
+	</div>
+</body>
+</html>
